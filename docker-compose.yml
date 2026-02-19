@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: openmu
+      POSTGRES_PASSWORD: openmu
+      POSTGRES_DB: openmu
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openmu"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  openmu:
+    image: munique/openmu
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_ADMIN_USER: openmu
+      DB_ADMIN_PW: openmu
+    ports:
+      # Admin panel
+      - "8090:80"
+      # Connect Server
+      - "44405:44405"
+      # Game Servers (Server 1: 55901-55903, Server 2: 55904-55906)
+      - "55901-55906:55901-55906"
+      # Chat Server
+      - "55980:55980"
+    command: ["-autostart"]
+
+volumes:
+  pgdata:

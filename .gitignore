@@ -1,0 +1,18 @@
+node_modules/
+.env
+
+# WASM client files (compiled separately, not part of this repo)
+public/*.wasm
+public/*.wasm.bak
+public/*.data
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Cloned client repositories (for local analysis only)
+clients/

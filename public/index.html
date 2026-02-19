@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>OpenMU Browser Stack</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        width: 100vw;
+        height: 100vh;
+        background: #111;
+        overflow: hidden;
+        font-family:
+          system-ui,
+          -apple-system,
+          sans-serif;
+      }
+      canvas#canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: none;
+      }
+      #info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: #aaa;
+        text-align: center;
+        padding: 2rem;
+      }
+      #info h1 {
+        color: #e0e0e0;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+      #info p {
+        max-width: 520px;
+        line-height: 1.6;
+        margin: 0.4rem 0;
+        font-size: 0.9rem;
+      }
+      #info a {
+        color: #6cb4ee;
+      }
+      #info code {
+        background: #222;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 0.85rem;
+      }
+      #info .tag {
+        display: inline-block;
+        margin-top: 1rem;
+        padding: 4px 12px;
+        border: 1px solid #444;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        color: #888;
+      }
+      #loading {
+        display: none;
+        position: absolute;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        color: #ccc;
+        font-size: 0.85rem;
+        text-align: center;
+      }
+      #loading .bar {
+        width: 260px;
+        height: 6px;
+        background: #333;
+        border-radius: 3px;
+        margin-top: 0.5rem;
+      }
+      #loading .bar-fill {
+        height: 100%;
+        width: 0%;
+        background: #6cb4ee;
+        border-radius: 3px;
+        transition: width 0.2s;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas
+      id="canvas"
+      oncontextmenu="event.preventDefault()"
+      tabindex="-1"
+    ></canvas>
+
+    <div id="info">
+      <h1>OpenMU Browser Stack</h1>
+      <p>Server infrastructure is running. No WASM client found.</p>
+      <p>
+        Compile a MU Online client (e.g.
+        <a href="https://github.com/sven-n/MuMain" target="_blank">MuMain</a>)
+        with Emscripten, then place the output files (<code>.js</code>,
+        <code>.wasm</code>, <code>.data</code>) in the
+        <code>public/</code> folder and add a <code>&lt;script&gt;</code> tag
+        below.
+      </p>
+      <span class="tag">WebSocket proxy :7100 &middot; Web :8080</span>
+    </div>
+
+    <div id="loading">
+      <span id="load-text">Loading...</span>
+      <div class="bar"><div class="bar-fill" id="bar-fill"></div></div>
+    </div>
+
+    <script>
+      var PROXY_WS_URL = "ws://127.0.0.1:7100";
+
+      var Module = {
+        canvas: document.getElementById("canvas"),
+
+        websocket: { url: PROXY_WS_URL },
+
+        print: function (t) {
+          console.log(t);
+        },
+        printErr: function (t) {
+          console.error(t);
+        },
+
+        setStatus: function (text) {
+          if (!text) {
+            document.getElementById("loading").style.display = "none";
+            return;
+          }
+          document.getElementById("loading").style.display = "block";
+          document.getElementById("load-text").textContent = text;
+          var m = text.match(/(\d+)\/(\d+)/);
+          if (m) {
+            document.getElementById("bar-fill").style.width =
+              (parseInt(m[1]) / parseInt(m[2])) * 100 + "%";
+          }
+        },
+
+        totalDependencies: 0,
+        monitorRunDependencies: function (left) {
+          this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(
+            left
+              ? "Loading... (" +
+                  (this.totalDependencies - left) +
+                  "/" +
+                  this.totalDependencies +
+                  ")"
+              : "",
+          );
+        },
+
+        onRuntimeInitialized: function () {
+          document.getElementById("info").style.display = "none";
+          document.getElementById("canvas").style.display = "block";
+          console.log("[OpenMU] WASM runtime initialized");
+        },
+      };
+
+      function resize() {
+        Module.canvas.width = window.innerWidth;
+        Module.canvas.height = window.innerHeight;
+      }
+      window.addEventListener("resize", resize);
+      resize();
+    </script>
+
+    <!--
+    Add your compiled WASM client script here. Example:
+    <script async src="MuMain.js"></script>
+  --></body>
+</html>
