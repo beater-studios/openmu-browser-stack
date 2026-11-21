@@ -132,7 +132,7 @@ s.on("data", data => {
     const user = Buffer.alloc(10, 0);
     user.write("test400");
     const pass = Buffer.alloc(20, 0);
-    pass.write("test400");
+    pass.write("123456");
     const xorKey = [0xFC, 0xCF, 0xAB];
     for (let i = 0; i < 10; i++) pkt[4 + i] = user[i] ^ xorKey[i % 3];
     for (let i = 0; i < 20; i++) pkt[14 + i] = pass[i] ^ xorKey[i % 3];

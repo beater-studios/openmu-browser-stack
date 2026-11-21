@@ -112,9 +112,9 @@ async function main() {
   await sleep(3000);
 
   // 2. Submit Login
-  console.log('\n--- Submitting Login (test400 / test400) ---');
+  console.log('\n--- Submitting Login (test400 / 123456) ---');
   await sendCmd('Runtime.evaluate', {
-    expression: `Module.ccall('MuWeb_SubmitLogin', 'boolean', ['string', 'string'], ['test400', 'test400'])`
+    expression: `Module.ccall('MuWeb_SubmitLogin', 'boolean', ['string', 'string'], ['test400', '123456'])`
   });
 
   // Wait until character list is loaded (ProtocolState == 50)

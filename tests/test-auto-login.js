@@ -165,12 +165,12 @@ async function main() {
   });
   console.log('CurrentProtocolState:', stateRes?.result?.value);
 
-  // 3. Submit Login Credentials: test400 / test400
-  console.log('\n--- Calling MuWeb_SubmitLogin("test400", "test400") ---');
+  // 3. Submit Login Credentials: test400 / 123456
+  console.log('\n--- Calling MuWeb_SubmitLogin("test400", "123456") ---');
   const loginResult = await sendCmd('Runtime.evaluate', {
     expression: `(() => {
       if (typeof Module.ccall === 'function') {
-        return Module.ccall('MuWeb_SubmitLogin', 'boolean', ['string', 'string'], ['test400', 'test400']);
+        return Module.ccall('MuWeb_SubmitLogin', 'boolean', ['string', 'string'], ['test400', '123456']);
       }
       return false;
     })()`,
